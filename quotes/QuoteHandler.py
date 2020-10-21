@@ -1,21 +1,27 @@
 import csv
 from datetime import date, time, datetime
 
-from quotes.Quote import Quote
+from quotes.Quote import get_quote_from_csv_string
 
 quote_command_add = "add"
+quote_command_show_all = "show_all"
 
 
 class QuoteHandler:
-    def __init__(self):
 
+    def __init__(self):
+        """Loads all quotes"""
         self.quotes = []
 
+        # Loading all quotes stored in data
         with open('data/quotes.csv', newline='') as csv_file:
             csv_reader = csv.DictReader(csv_file)
 
+            # Skipping the header
+#            csv_reader.next()
+
             for current_row in csv_reader:
-                self.quotes.append(current_row)
+                self.quotes.append(get_quote_from_csv_string(current_row))
 
     async def handle_quote(self, ctx):
         try:
@@ -45,19 +51,26 @@ class QuoteHandler:
 
         with open('data/quotes.csv', mode='a') as csv_file:
 
-            fieldnames = ['Date', 'Time', 'Quote', 'Author']
+            fieldnames = ['Date', 'Time', 'Quote', 'Author', 'Approved']
             writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
 
             current_date = date.today().strftime("%d.%m.%Y")
             current_time = datetime.now().strftime("%H:%M:%S")
 
-            writer.writerow({'Date': current_date, 'Time': current_time, 'Quote': quote_text, 'Author': quote_author})
+            is_approved = False
+
+            writer.writerow({
+                'Date': current_date,
+                'Time': current_time,
+                'Quote': quote_text,
+                'Author': quote_author,
+                'Approved': 'Yes'})
 
         await ctx.channel.send("Quote added")
 
     async def get_quote(self, quote_id, ctx):
         await ctx.channel.send(self.quotes[quote_id])
-        print(self.quotes[quote_id])
+        print(self.quotes[quote_id].to_string())
 
     def print_quotes(self):
         print(self.quotes)
