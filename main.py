@@ -1,10 +1,13 @@
 import os
 
+from dotenv import load_dotenv
 from twitchio import Client
 from twitchio.ext import commands
 from twitchio.ext.commands import CommandNotFound
 
 from quotes.QuoteHandler import QuoteHandler
+
+load_dotenv()
 
 bot = commands.Bot(
     # set up the bot
